@@ -12,5 +12,7 @@ const orderSchema = new mongoose.Schema({
   total: { type: Number, required: true }
 });
 
-const Order = mongoose.model("Order", orderSchema);
-export default Order;
+// const Order = mongoose.model("Order", orderSchema);
+// export default Order;
+
+export default mongoose.model("Order", orderSchema);
