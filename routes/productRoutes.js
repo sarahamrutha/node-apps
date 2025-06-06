@@ -1,5 +1,5 @@
 import express from "express";
-import Product from "./models/productModel.js";
+import Product from "../models/productModel.js"; // ✅ Corrected import path
 
 const router = express.Router();
 
@@ -13,10 +13,15 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST /api/products (optional - if you want to add products)
+// POST /api/products
 router.post("/", async (req, res) => {
   try {
     const { name, price, qty } = req.body;
+    
+    if (!name || !price || !qty) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
     const product = new Product({ name, price, qty });
     await product.save();
     res.status(201).json(product);
