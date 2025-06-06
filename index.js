@@ -1,46 +1,46 @@
-// index.js
+
 import express from "express";
-import cors from "cors"; 
+import cors from "cors";
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+import productRoutes from "./routes/productRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js";
+import authRoutes from "./routes/authRoutes.js"; // NEW
+
+dotenv.config();
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const app = express();
-app.use(cors()); // CORS middleware
+app.use(cors());
+app.use(express.json());
 
-app.listen(8080, () => {
-  mongoose.connect("mongodb://localhost:27017/gcet");
-  console.log("Server Started. Welcome Gagan!");
+// Connect to MongoDB
+mongoose.connect(MONGODB_URI, {
+  serverSelectionTimeoutMS: 10000,
+})
+.then(() => {
+  console.log("✅ MongoDB connected");
+  app.listen(8080, () => {
+    console.log("🚀 Server started on http://localhost:8080");
+  });
+})
+.catch((err) => {
+  console.error("❌ MongoDB connection error:", err.message);
+  process.exit(1);
 });
 
-const userScheme = mongoose.Schema({
-  name : {type: String},
-});
+// Test Routes
+app.get("/", (req, res) => res.send("Hello World"));
+app.get("/greet", (req, res) => res.send("Welcome to the website"));
+app.get("/name", (req, res) => res.send("Made by:- Sarah Amrutha"));
+app.get("/weather", (req, res) => res.json({ temperature: "41°C" }));
 
-const user = mongoose.model("User", userSchema);
+// Actual Routes
+app.use("/auth", authRoutes);           
+app.use("/products", productRoutes);
+app.use("/orders", orderRoutes);
+app.use("/cart", cartRoutes);          
 
-app.get("/", (req, res) => {
-  return res.send("Hello World");
-});
-
-app.get("/greet", (req, res) => {
-  res.send("Welcome to the website");
-});
-
-app.get("/name", (req, res) => {
-  res.send("Welcome to the browser, Sarah Amrutha");
-});
-
-app.get("/weather", (req, res) => {
-  res.json({ temperature: "41°C" }); 
-});
-
-app.get("/products", (req, res) => {
-  const products = [
-    { name: "Apple", price: 20, qty: 50 },
-    { name: "Mango", price: 25, qty: 40 },
-    { name: "Orange", price: 15, qty: 60 },
-    { name: "Blueberry", price: 35, qty: 30 },
-    { name: "Strawberry", price: 30, qty: 45 },
-    { name: "Pineapple", price: 50, qty: 45},
-  ];
-  res.json(products);
-});
+export default app;
